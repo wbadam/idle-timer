@@ -35,10 +35,10 @@
 	</organization>
 
 	<scm>
-		<url>git://github.com/mygithubaccount/MyComponent.git</url>
-		<connection>scm:git:git://github.com/mygithubaccount/MyComponent.git</connection>
+		<url>git://github.com/mygithubaccount/Timer.git</url>
+		<connection>scm:git:git://github.com/mygithubaccount/Timer.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection>
-		<tag>MyComponent add-on for Vaadin</tag>
+		<tag>Timer add-on for Vaadin</tag>
 	</scm>
 
 	<issueManagement>

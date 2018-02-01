@@ -1,20 +1,19 @@
 package org.vaadin.addon.demo;
 
-import org.vaadin.addon.MyComponent;
-
 import javax.servlet.annotation.WebServlet;
+
+import org.vaadin.addon.Timer;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @Theme("demo")
-@Title("MyComponent Add-on Demo")
+@Title("Timer Add-on Demo")
 @SuppressWarnings("serial")
 public class DemoUI extends UI
 {
@@ -27,17 +26,11 @@ public class DemoUI extends UI
     @Override
     protected void init(VaadinRequest request) {
 
-        // Initialize our new UI component
-        final MyComponent component = new MyComponent();
+        VerticalLayout layout = new VerticalLayout();
 
-        // Show it in the middle of the screen
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setStyleName("demoContentLayout");
-        layout.setSizeFull();
-        layout.setMargin(false);
-        layout.setSpacing(false);
-        layout.addComponent(component);
-        layout.setComponentAlignment(component, Alignment.MIDDLE_CENTER);
+        Timer timer = new Timer();
+        layout.addComponent(timer);
+
         setContent(layout);
     }
 }
