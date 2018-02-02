@@ -14,6 +14,7 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ApplicationConstants;
 import com.vaadin.ui.ConnectorTracker;
 import com.vaadin.ui.UI;
 
@@ -24,7 +25,9 @@ public class TimerVaadinServletService extends VaadinServletService {
         public boolean handleRequest(VaadinSession session,
                 VaadinRequest request,
                 VaadinResponse response) throws IOException {
-            if (!session.getUIs().isEmpty()) {
+            if (!request.getPathInfo()
+                    .contains("/" + ApplicationConstants.HEARTBEAT_PATH + "/")
+                    && !session.getUIs().isEmpty()) {
                 Object attribute = session
                         .getAttribute(Timer.TIMER_CONNECTOR_IDS);
                 if (attribute != null) {
