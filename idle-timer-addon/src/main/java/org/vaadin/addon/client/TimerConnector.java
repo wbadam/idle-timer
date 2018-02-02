@@ -17,7 +17,7 @@ public class TimerConnector extends AbstractComponentConnector {
         registerRpc(TimerClientRpc.class, new TimerClientRpc() {
             @Override
             public void resetTimer(int seconds) {
-
+                getWidget().setRemainingSeconds(seconds);
             }
         });
     }
