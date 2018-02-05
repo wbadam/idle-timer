@@ -43,14 +43,30 @@ public class TimerWidget extends Label {
     private long remainingSeconds;
     private long timeDifference;
 
+    private final IdleTimer timer = new IdleTimer();
+
     public TimerWidget() {
         setStyleName("idle-timer");
-
-        new IdleTimer().startTimer();
     }
 
-    public void setRemainingSeconds(int seconds) {
+    void setRemainingSeconds(int seconds) {
         this.remainingSeconds = seconds;
+    }
+
+    void pauseTimer() {
+        if (timer.isRunning()) {
+            timer.cancel();
+        }
+    }
+
+    void resumeTimer() {
+        if (!timer.isRunning()) {
+            timer.startTimer();
+        }
+    }
+
+    void clearText() {
+        setText("");
     }
 
     public void setTimeDifference(long timeDifference) {

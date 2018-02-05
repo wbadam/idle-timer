@@ -15,11 +15,11 @@ import com.vaadin.shared.ui.Connect;
 @Connect(Timer.class)
 public class TimerConnector extends AbstractComponentConnector {
 
-    private static final String STORAGE_KEY = "org.vaadin.addon.idletimer.timestamp";
+//    private static final String STORAGE_KEY_TIMESTAMP = "org.vaadin.addon.idletimer.timestamp";
 
     private TimerServerRpc rpc = RpcProxy.create(TimerServerRpc.class, this);
 
-    private JavaScriptObject storageCallback;
+//    private JavaScriptObject storageCallback;
 
     private long timeLimit;
 
@@ -27,14 +27,38 @@ public class TimerConnector extends AbstractComponentConnector {
 
         registerRpc(TimerClientRpc.class, new TimerClientRpc() {
             @Override
+            public void start(long timestamp) {
+                timeLimit = timestamp;
+                updateTimer(timestamp);
+                getWidget().resumeTimer();
+            }
+
+            @Override
+            public void disable() {
+                getWidget().pauseTimer();
+            }
+
+            @Override
+            public void enable() {
+                getWidget().resumeTimer();
+            }
+
+            @Override
+            public void stop() {
+                getWidget().pauseTimer();
+                getWidget().clearText();
+            }
+
+            @Override
             public void resetTimer(long timestamp) {
                 timeLimit = timestamp;
-                storeTimestamp(timestamp);
                 updateTimer(timestamp);
+
+//                updateLastChange();
             }
         });
 
-        storageCallback = addStorageListener();
+//        storageCallback = addStorageListener();
     }
 
     private void updateTimer(long timestamp) {
@@ -42,25 +66,26 @@ public class TimerConnector extends AbstractComponentConnector {
                 .toSeconds(timestamp - new Date().getTime()));
     }
 
-    private void handleStorageEvent(StorageEvent event) {
-        if (STORAGE_KEY.equals(event.getKey())) {
-            timeLimit = Long.valueOf(event.getNewValue());
-            updateTimer(timeLimit);
-        }
-    }
+//    private void handleStorageEvent(StorageEvent event) {
+//        if (STORAGE_KEY_TIMESTAMP.equals(event.getKey())) {
+//            // TODO: 05/02/2018 Check if all browsers behave well
+//            rpc.requestStatus();
+//        }
+//    }
 
-    private native void storeTimestamp(Long timestamp)/*-{
-        $wnd.localStorage.setItem(@org.vaadin.addon.client.TimerConnector::STORAGE_KEY, timestamp);
-    }-*/;
+//    private void updateLastChange() {
+//        Storage.getLocalStorageIfSupported().setItem(STORAGE_KEY_TIMESTAMP,
+//                Long.toString(new Date().getTime()));
+//    }
 
-    private native JavaScriptObject addStorageListener()/*-{
-        var self = this;
-        var callbackFunc = $entry(function(e) {
-            self.@org.vaadin.addon.client.TimerConnector::handleStorageEvent(*)(e);
-        });
-        $wnd.addEventListener("storage", callbackFunc, false);
-        return callbackFunc;
-    }-*/;
+//    private native JavaScriptObject addStorageListener()/*-{
+//        var self = this;
+//        var callbackFunc = $entry(function(e) {
+//            self.@org.vaadin.addon.client.TimerConnector::handleStorageEvent(*)(e);
+//        });
+//        $wnd.addEventListener("storage", callbackFunc, false);
+//        return callbackFunc;
+//    }-*/;
 
     @Override
     public void onStateChanged(StateChangeEvent stateChangeEvent) {
@@ -75,12 +100,12 @@ public class TimerConnector extends AbstractComponentConnector {
     public void onUnregister() {
         super.onUnregister();
 
-        removeStorageListener(storageCallback);
+//        removeStorageListener(storageCallback);
     }
 
-    private native void removeStorageListener(JavaScriptObject callback)/*-{
-        $wnd.removeEventListener("storage", callback, false);
-    }-*/;
+//    private native void removeStorageListener(JavaScriptObject callback)/*-{
+//        $wnd.removeEventListener("storage", callback, false);
+//    }-*/;
 
     @Override
     public TimerWidget getWidget() {

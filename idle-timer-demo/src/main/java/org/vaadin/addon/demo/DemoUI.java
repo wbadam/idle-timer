@@ -34,6 +34,7 @@ public class DemoUI extends UI
 
         Timer timer = new Timer();
         timer.setTimerSeconds(160);
+        timer.start();
         layout.addComponent(timer);
 
         setContent(layout);

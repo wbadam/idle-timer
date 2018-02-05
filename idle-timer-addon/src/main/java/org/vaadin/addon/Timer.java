@@ -9,14 +9,52 @@ import org.vaadin.addon.client.TimerClientRpc;
 import org.vaadin.addon.client.TimerState;
 
 import com.vaadin.server.Page;
+import com.vaadin.shared.Registration;
 import com.vaadin.ui.AbstractComponent;
 
 public class Timer extends AbstractComponent {
 
     static final String TIMER_CONNECTOR_IDS = "timerConnectorIds";
 
+    private boolean refresh = true;
+
     public Timer() {
 
+    }
+
+    public void start() {
+        getRpcProxy(TimerClientRpc.class).start(getExpiryClientTimestamp());
+    }
+
+    public void disable() {
+        getRpcProxy(TimerClientRpc.class).disable();
+    }
+
+    public void enable() {
+        getRpcProxy(TimerClientRpc.class).enable();
+    }
+
+    public void stop() {
+        getRpcProxy(TimerClientRpc.class).stop();
+    }
+
+    public void setRefresh(boolean refresh) {
+        this.refresh = refresh;
+    }
+
+    public Registration addStartListener() {
+        // TODO: 05/02/2018  
+        return null;
+    }
+
+    public Registration addStopListener() {
+        // TODO: 05/02/2018  
+        return null;
+    }
+
+    public Registration addListenerTo(int minutes) {
+        // TODO: 05/02/2018
+        return null;
     }
 
     @Override
@@ -64,10 +102,15 @@ public class Timer extends AbstractComponent {
     }
 
     void resetTimer() {
-        getRpcProxy(TimerClientRpc.class).resetTimer(
-                new Date().getTime() + getState(false).timeDifference
-                        + TimeUnit.SECONDS
-                        .toMillis(getState(false).resetSeconds));
+        if (refresh) {
+            getRpcProxy(TimerClientRpc.class)
+                    .resetTimer(getExpiryClientTimestamp());
+        }
+    }
+
+    private long getExpiryClientTimestamp() {
+        return new Date().getTime() + getState(false).timeDifference
+                + TimeUnit.SECONDS.toMillis(getState(false).resetSeconds);
     }
 
     @Override
