@@ -30,7 +30,9 @@ public class TimerWidget extends Label {
 
             setText(time.toString());
 
-            remainingSeconds--;
+            if (--remainingSeconds < 0) {
+                cancel();
+            }
         }
 
         public void startTimer() {
@@ -39,6 +41,7 @@ public class TimerWidget extends Label {
     }
 
     private long remainingSeconds;
+    private long timeDifference;
 
     public TimerWidget() {
         setStyleName("idle-timer");
@@ -48,5 +51,9 @@ public class TimerWidget extends Label {
 
     public void setRemainingSeconds(int seconds) {
         this.remainingSeconds = seconds;
+    }
+
+    public void setTimeDifference(long timeDifference) {
+        this.timeDifference = timeDifference;
     }
 }

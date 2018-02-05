@@ -34,9 +34,8 @@ public class TimerVaadinServletService extends VaadinServletService {
 
                     Set<String> connectorIds = (Set<String>) attribute;
 
-                    Iterator<UI> UIs = session.getUIs().iterator();
-                    while (UIs.hasNext()) {
-                        ConnectorTracker tracker = UIs.next()
+                    for (UI components : session.getUIs()) {
+                        ConnectorTracker tracker = components
                                 .getConnectorTracker();
 
                         for (String id : connectorIds) {

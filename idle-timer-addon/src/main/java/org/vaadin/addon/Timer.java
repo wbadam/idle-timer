@@ -1,11 +1,14 @@
 package org.vaadin.addon;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.vaadin.addon.client.TimerClientRpc;
 import org.vaadin.addon.client.TimerState;
 
+import com.vaadin.server.Page;
 import com.vaadin.ui.AbstractComponent;
 
 public class Timer extends AbstractComponent {
@@ -25,6 +28,10 @@ public class Timer extends AbstractComponent {
         }
 
         super.attach();
+
+        getState().timeDifference =
+                new Date().getTime() - Page.getCurrent().getWebBrowser()
+                        .getCurrentDate().getTime();
 
         addConnectorIdToSession(getConnectorId());
     }
@@ -52,12 +59,24 @@ public class Timer extends AbstractComponent {
                 .remove(connectorId);
     }
 
+    public void setTimerSeconds(int seconds) {
+        getState().resetSeconds = seconds;
+    }
+
     void resetTimer() {
-        getRpcProxy(TimerClientRpc.class).resetTimer(getState().resetSeconds);
+        getRpcProxy(TimerClientRpc.class).resetTimer(
+                new Date().getTime() + getState(false).timeDifference
+                        + TimeUnit.SECONDS
+                        .toMillis(getState(false).resetSeconds));
     }
 
     @Override
     protected TimerState getState() {
         return (TimerState) super.getState();
+    }
+
+    @Override
+    protected TimerState getState(boolean markAsDirty) {
+        return (TimerState) super.getState(markAsDirty);
     }
 }

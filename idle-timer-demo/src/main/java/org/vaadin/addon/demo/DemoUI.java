@@ -33,6 +33,7 @@ public class DemoUI extends UI
         layout.addComponent(new Button("Btn", e -> Notification.show("clicked")));
 
         Timer timer = new Timer();
+        timer.setTimerSeconds(160);
         layout.addComponent(timer);
 
         setContent(layout);
