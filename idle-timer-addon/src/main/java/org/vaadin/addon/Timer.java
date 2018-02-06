@@ -6,7 +6,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.vaadin.addon.client.TimerClientRpc;
+import org.vaadin.addon.client.TimerServerRpc;
 import org.vaadin.addon.client.TimerState;
+import org.vaadin.addon.events.TimerStopEvent;
+import org.vaadin.addon.events.TimerStopListener;
 
 import com.vaadin.server.Page;
 import com.vaadin.shared.Registration;
@@ -20,6 +23,12 @@ public class Timer extends AbstractComponent {
 
     public Timer() {
 
+        registerRpc(new TimerServerRpc() {
+            @Override
+            public void timeout() {
+                fireEvent(new TimerStopEvent(Timer.this));
+            }
+        });
     }
 
     public void start() {
@@ -47,9 +56,9 @@ public class Timer extends AbstractComponent {
         return null;
     }
 
-    public Registration addStopListener() {
-        // TODO: 05/02/2018  
-        return null;
+    public Registration addStopListener(TimerStopListener listener) {
+        return addListener(TimerState.EVENT_STOP, TimerStopEvent.class,
+                listener, TimerStopListener.TIMER_STOP_METHOD);
     }
 
     public Registration addListenerTo(int minutes) {
