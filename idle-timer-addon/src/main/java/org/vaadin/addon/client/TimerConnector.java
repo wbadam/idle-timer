@@ -1,7 +1,6 @@
 package org.vaadin.addon.client;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.vaadin.addon.Timer;
@@ -29,15 +28,12 @@ public class TimerConnector extends AbstractComponentConnector {
             getWidget().setText(format(min, sec));
 
             // Notifications
-            Iterator<Integer> i = getState().notifySeconds.iterator();
-            while (i.hasNext()) {
-                if (i.next() == remainingSeconds) {
-                    rpc.notifyPass(remainingSeconds);
-                    i.remove();
-                }
+            if (getState().notifySeconds.contains(remainingSeconds)) {
+                rpc.notifyPass(remainingSeconds);
             }
 
             if (--remainingSeconds < 0) {
+                rpc.timeout();
                 cancel();
             }
         }

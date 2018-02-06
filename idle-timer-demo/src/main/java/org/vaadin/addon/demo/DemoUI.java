@@ -4,6 +4,8 @@ import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.addon.Timer;
 import org.vaadin.addon.TimerVaadinServlet;
+import org.vaadin.addon.events.TimerTimePassEvent;
+import org.vaadin.addon.events.TimerTimePassListener;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -33,8 +35,23 @@ public class DemoUI extends UI
         layout.addComponent(new Button("Btn", e -> Notification.show("clicked")));
 
         Timer timer = new Timer(3, "%d minutes and %02d seconds left");
+        timer.setTimerSeconds(130);
         timer.start();
         layout.addComponent(timer);
+
+        timer.addListenerTo(2, new TimerTimePassListener() {
+            @Override
+            public void timePass(TimerTimePassEvent event) {
+                System.out.println("2 minutes");
+            }
+        });
+
+        timer.addListenerTo(1, new TimerTimePassListener() {
+            @Override
+            public void timePass(TimerTimePassEvent event) {
+                System.out.println("1 minutes");
+            }
+        });
 
         setContent(layout);
     }
