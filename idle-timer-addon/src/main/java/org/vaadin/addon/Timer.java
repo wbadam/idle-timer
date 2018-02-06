@@ -10,6 +10,8 @@ import org.vaadin.addon.client.TimerServerRpc;
 import org.vaadin.addon.client.TimerState;
 import org.vaadin.addon.events.TimerStopEvent;
 import org.vaadin.addon.events.TimerStopListener;
+import org.vaadin.addon.events.TimerTimePassEvent;
+import org.vaadin.addon.events.TimerTimePassListener;
 
 import com.vaadin.server.Page;
 import com.vaadin.shared.Registration;
@@ -31,7 +33,7 @@ public class Timer extends AbstractComponent {
 
             @Override
             public void notifyPass(int remainingSeconds) {
-
+                fireEvent(new TimerTimePassEvent(Timer.this, remainingSeconds));
             }
         });
     }
@@ -66,10 +68,22 @@ public class Timer extends AbstractComponent {
                 listener, TimerStopListener.TIMER_STOP_METHOD);
     }
 
-    public Registration addListenerTo(int minutes) {
+    public Registration addListenerTo(int minutes,
+            TimerTimePassListener listener) {
         getState().notifySeconds.add((int) TimeUnit.MINUTES.toSeconds(minutes));
-        // TODO: 05/02/2018
-        return null;
+
+        TimerTimePassListener innerListener = new TimerTimePassListener() {
+            @Override
+            public void timePass(TimerTimePassEvent event) {
+                if (minutes == TimeUnit.SECONDS
+                        .toMinutes(event.getSecondsLeft())) {
+                    listener.timePass(event);
+                }
+            }
+        };
+
+        return addListener(TimerState.EVENT_PASS, TimerTimePassEvent.class,
+                innerListener, TimerTimePassListener.TIME_PASS_METHOD);
     }
 
     @Override
