@@ -13,10 +13,12 @@ import org.vaadin.addon.events.TimerStopListener;
 import org.vaadin.addon.events.TimerTimePassEvent;
 import org.vaadin.addon.events.TimerTimePassListener;
 
+import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Registration;
 import com.vaadin.ui.AbstractComponent;
 
+@JavaScript("sprintf.js")
 public class Timer extends AbstractComponent {
 
     static final String TIMER_CONNECTOR_IDS = "timerConnectorIds";
@@ -24,7 +26,6 @@ public class Timer extends AbstractComponent {
     private boolean refresh = true;
 
     public Timer() {
-
         registerRpc(new TimerServerRpc() {
             @Override
             public void timeout() {
@@ -36,6 +37,12 @@ public class Timer extends AbstractComponent {
                 fireEvent(new TimerTimePassEvent(Timer.this, remainingSeconds));
             }
         });
+    }
+
+    public Timer(int minutes, String format) {
+        this();
+        setTimerMinutes(minutes);
+        setFormat(format);
     }
 
     public void start() {
@@ -126,8 +133,16 @@ public class Timer extends AbstractComponent {
                 .remove(connectorId);
     }
 
+    public void setTimerMinutes(int minutes) {
+        setTimerSeconds((int) TimeUnit.MINUTES.toSeconds(minutes));
+    }
+
     public void setTimerSeconds(int seconds) {
         getState().resetSeconds = seconds;
+    }
+
+    public void setFormat(String format) {
+        getState().format = format;
     }
 
     void resetTimer() {

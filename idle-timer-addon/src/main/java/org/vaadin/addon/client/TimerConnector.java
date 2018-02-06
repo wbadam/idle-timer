@@ -22,22 +22,11 @@ public class TimerConnector extends AbstractComponentConnector {
 
         @Override
         public void run() {
-            final long min = TimeUnit.SECONDS.toMinutes(remainingSeconds);
-            final long sec = TimeUnit.SECONDS.toSeconds(
+            final int min = (int) TimeUnit.SECONDS.toMinutes(remainingSeconds);
+            final int sec = (int) TimeUnit.SECONDS.toSeconds(
                     remainingSeconds - TimeUnit.MINUTES.toSeconds(min));
 
-            StringBuilder time = new StringBuilder();
-            if (min < 10) {
-                time.append("0");
-            }
-            time.append(min);
-            time.append(":");
-            if (sec < 10) {
-                time.append("0");
-            }
-            time.append(sec);
-
-            getWidget().setText(time.toString());
+            getWidget().setText(format(min, sec));
 
             // Notifications
             Iterator<Integer> i = getState().notifySeconds.iterator();
@@ -143,6 +132,14 @@ public class TimerConnector extends AbstractComponentConnector {
 //        $wnd.addEventListener("storage", callbackFunc, false);
 //        return callbackFunc;
 //    }-*/;
+
+    private String format(int minutes, int seconds) {
+        return format(getState().format, minutes, seconds);
+    }
+
+    private native String format(String formatString, int minutes, int seconds)/*-{
+        return $wnd.sprintf(formatString, minutes, seconds);
+    }-*/;
 
     @Override
     public void onStateChanged(StateChangeEvent stateChangeEvent) {

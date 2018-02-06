@@ -14,4 +14,6 @@ public class TimerState extends AbstractComponentState {
     public long timeDifference;
 
     public List<Integer> notifySeconds = new ArrayList<>();
+
+    public String format = "%02d:%02d";
 }
