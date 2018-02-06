@@ -1,12 +1,11 @@
 package org.vaadin.addon.client;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.vaadin.addon.Timer;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.storage.client.StorageEvent;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.AbstractComponentConnector;
@@ -15,11 +14,57 @@ import com.vaadin.shared.ui.Connect;
 @Connect(Timer.class)
 public class TimerConnector extends AbstractComponentConnector {
 
+    private class IdleTimer extends com.google.gwt.user.client.Timer {
+
+        private static final int PERIOD = 1000;
+
+        private int remainingSeconds;
+
+        @Override
+        public void run() {
+            final long min = TimeUnit.SECONDS.toMinutes(remainingSeconds);
+            final long sec = TimeUnit.SECONDS.toSeconds(
+                    remainingSeconds - TimeUnit.MINUTES.toSeconds(min));
+
+            StringBuilder time = new StringBuilder();
+            if (min < 10) {
+                time.append("0");
+            }
+            time.append(min);
+            time.append(":");
+            if (sec < 10) {
+                time.append("0");
+            }
+            time.append(sec);
+
+            getWidget().setText(time.toString());
+
+            // Notifications
+            Iterator<Integer> i = getState().notifySeconds.iterator();
+            while (i.hasNext()) {
+                if (i.next() == remainingSeconds) {
+                    rpc.notifyPass(remainingSeconds);
+                    i.remove();
+                }
+            }
+
+            if (--remainingSeconds < 0) {
+                cancel();
+            }
+        }
+
+        public void startTimer() {
+            scheduleRepeating(PERIOD);
+        }
+    }
+
 //    private static final String STORAGE_KEY_TIMESTAMP = "org.vaadin.addon.idletimer.timestamp";
 
     private TimerServerRpc rpc = RpcProxy.create(TimerServerRpc.class, this);
 
 //    private JavaScriptObject storageCallback;
+
+    private final IdleTimer timer = new IdleTimer();
 
     private long timeLimit;
 
@@ -30,22 +75,22 @@ public class TimerConnector extends AbstractComponentConnector {
             public void start(long timestamp) {
                 timeLimit = timestamp;
                 updateTimer(timestamp);
-                getWidget().resumeTimer();
+                resumeTimer();
             }
 
             @Override
             public void disable() {
-                getWidget().pauseTimer();
+                pauseTimer();
             }
 
             @Override
             public void enable() {
-                getWidget().resumeTimer();
+                resumeTimer();
             }
 
             @Override
             public void stop() {
-                getWidget().pauseTimer();
+                pauseTimer();
                 getWidget().clearText();
             }
 
@@ -61,9 +106,21 @@ public class TimerConnector extends AbstractComponentConnector {
 //        storageCallback = addStorageListener();
     }
 
+    private void pauseTimer() {
+        if (timer.isRunning()) {
+            timer.cancel();
+        }
+    }
+
+    private void resumeTimer() {
+        if (!timer.isRunning()) {
+            timer.startTimer();
+        }
+    }
+
     private void updateTimer(long timestamp) {
-        getWidget().setRemainingSeconds((int) TimeUnit.MILLISECONDS
-                .toSeconds(timestamp - new Date().getTime()));
+        timer.remainingSeconds = (int) TimeUnit.MILLISECONDS
+                .toSeconds(timestamp - new Date().getTime());
     }
 
 //    private void handleStorageEvent(StorageEvent event) {

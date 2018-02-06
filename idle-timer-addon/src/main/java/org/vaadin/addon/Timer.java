@@ -28,6 +28,11 @@ public class Timer extends AbstractComponent {
             public void timeout() {
                 fireEvent(new TimerStopEvent(Timer.this));
             }
+
+            @Override
+            public void notifyPass(int remainingSeconds) {
+
+            }
         });
     }
 
@@ -62,6 +67,7 @@ public class Timer extends AbstractComponent {
     }
 
     public Registration addListenerTo(int minutes) {
+        getState().notifySeconds.add((int) TimeUnit.MINUTES.toSeconds(minutes));
         // TODO: 05/02/2018
         return null;
     }
